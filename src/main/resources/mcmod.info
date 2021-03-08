@@ -1,0 +1,16 @@
+[
+{
+  "modid": "instant_climb",
+  "name": "Instant Climb",
+  "description": "Instantly climb up and down ladders/vines.",
+  "version": "1.0",
+  "mcversion": "1.12.2",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Furgl"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
