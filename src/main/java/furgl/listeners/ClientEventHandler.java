@@ -45,7 +45,7 @@ public class ClientEventHandler {
 		try {
 			if (event.getItemStack() != null && event.getItemStack().getItem() instanceof ItemShulkerBox &&
 					Minecraft.getMinecraft().player != null) {
-				Slot slot = Minecraft.getMinecraft().player.inventoryContainer.getSlotFromInventory(Minecraft.getMinecraft().player.inventory, selectedShulkerBoxSlot);
+				Slot slot = selectedShulkerBoxSlot == -1 ? null : Minecraft.getMinecraft().player.inventoryContainer.getSlotFromInventory(Minecraft.getMinecraft().player.inventory, selectedShulkerBoxSlot);
 				if (slot != null && slot.getStack() == event.getItemStack())
 					event.getToolTip().add(TextFormatting.RED+""+TextFormatting.ITALIC+"Right-click to close");
 				else
