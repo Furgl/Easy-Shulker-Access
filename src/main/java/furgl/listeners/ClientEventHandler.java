@@ -6,8 +6,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import furgl.ShulkerAccess;
 import furgl.packets.CPacketOpenShulkerBox;
+import furgl.utils.Utils;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
@@ -16,9 +18,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.GuiContainerEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -33,14 +33,15 @@ public class ClientEventHandler {
 	/**Slot in player's inventory of the shulker box that is opened*/
 	private static int selectedShulkerBoxSlot = -1;
 
-	/** Reset selected shulker box slot when container is closed */
+	/**Reset selected shulker box slot null container is opened (no container is opened)*/ 
 	@SubscribeEvent
-	public static void closeContainer(GuiOpenEvent event) {
-		if (!(event.getGui() instanceof ShulkerBoxScreen))
+	public static void openGui(GuiOpenEvent event) {
+		if (event.getGui() == null) 
 			selectedShulkerBoxSlot = -1;
 	}
 
-	/** Add info to tooltips */
+	/** Add info to tooltips 
+	 * Fixes any issues with open/close being wrong (mainly for creative mode)*/
 	@SubscribeEvent
 	public static void tooltipEvent(ItemTooltipEvent event) {
 		try { 
@@ -48,16 +49,28 @@ public class ClientEventHandler {
 					((BlockItem)event.getItemStack().getItem()).getBlock() instanceof ShulkerBoxBlock && 
 					Minecraft.getInstance().player != null) {
 				if (selectedShulkerBoxSlot != -1 && event.getPlayer().inventory.getStackInSlot(selectedShulkerBoxSlot) == event.getItemStack())
-					event.getToolTip().add(new StringTextComponent(TextFormatting.RED+""+TextFormatting.ITALIC+"Right-click to close"));
+					event.getToolTip().replaceAll(comp -> {
+						if (comp.getString().contains(Utils.OPEN_TEXT))
+							return new StringTextComponent(Utils.CLOSE_TEXT);
+						else
+							return comp;
+					});
+
 				else
-					event.getToolTip().add(new StringTextComponent(TextFormatting.GOLD+""+TextFormatting.ITALIC+"Right-click to open"));
+					event.getToolTip().replaceAll(comp -> {
+						if (comp.getString().contains(Utils.CLOSE_TEXT))
+							return new StringTextComponent(Utils.OPEN_TEXT);
+						else
+							return comp;
+					});
 			}
-		} catch (Exception e) {
+		} 
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	/** Highlight selected shulker box slot */
+	/**Highlight selected shulker box slot*/
 	@SubscribeEvent
 	public static void drawGui(GuiContainerEvent.DrawBackground event) {
 		try {
@@ -90,14 +103,15 @@ public class ClientEventHandler {
 	@SubscribeEvent
 	public static void onClickPre(GuiScreenEvent.MouseClickedEvent.Pre event) {
 		try {
-			if (event.getGui() instanceof ContainerScreen) {
-				ContainerScreen container = ((ContainerScreen) event.getGui());
+			ClientPlayerEntity player = Minecraft.getInstance().player;
+			if (player != null && event.getGui() instanceof ContainerScreen) {
+				ContainerScreen container = ((ContainerScreen)event.getGui());
 				// clicking on a slot in player's inventory
-				if (container.getSlotUnderMouse() != null
-						&& container.getSlotUnderMouse().inventory instanceof PlayerInventory) {
+				if (container.getSlotUnderMouse() != null && 
+						container.getSlotUnderMouse().inventory instanceof PlayerInventory) {
 					// clicking shulker box
-					if (container.getSlotUnderMouse().getStack() != null
-							&& container.getSlotUnderMouse().getStack().getItem() instanceof BlockItem &&
+					if (container.getSlotUnderMouse().getStack() != null && 
+							container.getSlotUnderMouse().getStack().getItem() instanceof BlockItem &&
 							((BlockItem)container.getSlotUnderMouse().getStack().getItem()).getBlock() instanceof ShulkerBoxBlock) {
 						// already selected
 						if (selectedShulkerBoxSlot == container.getSlotUnderMouse().getSlotIndex()
@@ -105,25 +119,23 @@ public class ClientEventHandler {
 							// if right-clicking, deselect it, otherwise ignore click
 							if (event.getButton() == 1) {
 								selectedShulkerBoxSlot = -1;
-								Minecraft.getInstance()
-								.displayGuiScreen(new InventoryScreen(Minecraft.getInstance().player));
 								ShulkerAccess.NETWORK.sendToServer(new CPacketOpenShulkerBox(selectedShulkerBoxSlot));
-								Minecraft.getInstance().player.playSound(SoundEvents.BLOCK_SHULKER_BOX_CLOSE, 0.5f,
-										1.0f);
+								Minecraft.getInstance().displayGuiScreen(new InventoryScreen(player));
 							}
 							event.setCanceled(true);
 						}
 						// select and open shulker box
-						else if (event.getButton() == 1) {
+						else if (selectedShulkerBoxSlot != container.getSlotUnderMouse().getSlotIndex() &&
+								event.getButton() == 1) {
 							selectedShulkerBoxSlot = container.getSlotUnderMouse().getSlotIndex();
 							ShulkerAccess.NETWORK.sendToServer(new CPacketOpenShulkerBox(selectedShulkerBoxSlot));
-							Minecraft.getInstance().player.playSound(SoundEvents.BLOCK_SHULKER_BOX_OPEN, 0.5f, 1.0f);
 							event.setCanceled(true);
 						}
 					}
 				}
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
