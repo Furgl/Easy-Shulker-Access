@@ -49,5 +49,5 @@ public class ShulkerBoxListener implements IContainerListener {
 
 	@Override
 	public void setContainerData(Container containerIn, int varToUpdate, int newValue) {}
-	
+
 }
