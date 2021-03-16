@@ -50,7 +50,7 @@ public class ShulkerBoxListener implements IContainerListener {
 
 	@Override
 	public void sendWindowProperty(Container containerIn, int varToUpdate, int newValue) {}
-
+	
 	@Override
 	public void sendAllWindowProperties(Container containerIn, IInventory inventory) {}
 
