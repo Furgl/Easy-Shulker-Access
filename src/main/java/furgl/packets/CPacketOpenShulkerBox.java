@@ -4,7 +4,6 @@ import furgl.utils.Utils;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.SoundEvents;
-import net.minecraft.item.ItemShulkerBox;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketCustomSound;
 import net.minecraft.util.IThreadListener;
@@ -51,7 +50,7 @@ public class CPacketOpenShulkerBox implements IMessage {
 					// selected shulker box - open container
 					else {
 						ItemStack stack = player.inventory.getStackInSlot(packet.slot);
-						if (stack != null && !stack.isEmpty() && stack.getItem() instanceof ItemShulkerBox) 
+						if (Utils.isShulkerBox(stack)) 
 							Utils.openShulkerBox(player, stack);
 					}
 				}

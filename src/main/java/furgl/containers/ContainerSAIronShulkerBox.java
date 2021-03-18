@@ -1,24 +1,24 @@
 package furgl.containers;
 
+import cpw.mods.ironchest.common.blocks.shulker.IronShulkerBoxType;
+import cpw.mods.ironchest.common.gui.shulker.ContainerIronShulkerBox;
 import furgl.utils.Utils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.ClickType;
-import net.minecraft.inventory.ContainerShulkerBox;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketCustomSound;
-import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraft.util.SoundCategory;
 
-public class ContainerSAShulkerBox extends ContainerShulkerBox {
+public class ContainerSAIronShulkerBox extends ContainerIronShulkerBox {
 
 	private ItemStack stack;
 
-	public ContainerSAShulkerBox(InventoryPlayer playerInventoryIn, IInventory inventoryIn, EntityPlayer player, ItemStack stack) {
-		super(playerInventoryIn, inventoryIn, player);
+	public ContainerSAIronShulkerBox(InventoryPlayer playerInventoryIn, IInventory inventoryIn, ItemStack stack, IronShulkerBoxType type) {
+		super(playerInventoryIn, inventoryIn, type, type.xSize, type.ySize);
 		this.stack = stack;
 		Utils.updateTooltip(stack, false);
 	}
@@ -26,14 +26,6 @@ public class ContainerSAShulkerBox extends ContainerShulkerBox {
 	@Override
 	public void onContainerClosed(EntityPlayer playerIn) {
 		Utils.updateTooltip(stack, true);
-		// update to client cuz the container changes so tooltip won't update on its own
-		if (playerIn instanceof EntityPlayerMP) {
-			for (int i=0; i<this.inventorySlots.size(); ++i) {
-				if (ItemStack.areItemStacksEqual(stack, this.inventorySlots.get(i).getStack())) 
-					// slot-18 for some reason..
-					((EntityPlayerMP) playerIn).connection.sendPacket(new SPacketSetSlot(playerIn.inventoryContainer.windowId, i-18, stack.copy()));
-			}
-		}
 		super.onContainerClosed(playerIn);
 	}
 
