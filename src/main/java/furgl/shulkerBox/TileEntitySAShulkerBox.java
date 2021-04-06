@@ -1,7 +1,6 @@
 package furgl.shulkerBox;
 
 import furgl.containers.ContainerSAShulkerBox;
-import furgl.utils.Utils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -14,7 +13,7 @@ public class TileEntitySAShulkerBox extends TileEntityShulkerBox {
 	private ItemStack stack;
 
 	public TileEntitySAShulkerBox(World world, ItemStack stack) {
-		super(Utils.getColor(stack));
+		super(/*Utils.getColor(stack)*/);
 		this.setWorld(world);
 		this.stack = stack;
 		if (stack != null) {

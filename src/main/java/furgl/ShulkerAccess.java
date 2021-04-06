@@ -22,7 +22,7 @@ public class ShulkerAccess {
 
 	public static final String MODID = "shulker_access";
 	public static final String MODNAME = "Easy Shulker Access";
-	public static final String VERSION = "1.2";
+	public static final String VERSION = "1.1.1";
 
 	public static final Logger LOGGER = LogManager.getLogManager().getLogger(MODID);
 	public static SimpleNetworkWrapper network = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);

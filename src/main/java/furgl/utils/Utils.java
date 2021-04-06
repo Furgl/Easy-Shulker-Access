@@ -2,9 +2,6 @@ package furgl.utils;
 
 import javax.annotation.Nullable;
 
-import cpw.mods.ironchest.common.blocks.shulker.IronShulkerBoxType;
-import furgl.ShulkerAccess;
-import furgl.packets.SPacketOpenIronShulkerBox;
 import furgl.shulkerBox.ShulkerBoxListener;
 import furgl.shulkerBox.TileEntitySAShulkerBox;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -12,7 +9,6 @@ import net.minecraft.client.gui.inventory.GuiShulkerBox;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.ClickType;
-import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemShulkerBox;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -20,10 +16,8 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.network.play.server.SPacketCustomSound;
 import net.minecraft.network.play.server.SPacketOpenWindow;
-import net.minecraft.tileentity.TileEntityLockableLoot;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -31,25 +25,20 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class Utils {
 	
 	// Iron Chest classes
-	private static final String IRON_SHULKER_ITEM = "cpw.mods.ironchest.common.items.shulker.ItemIronShulkerBox";
-	private static final String IRON_SHULKER_GUI = "cpw.mods.ironchest.client.gui.shulker.GUIShulkerChest";
+	//private static final String IRON_SHULKER_ITEM = "cpw.mods.ironchest.common.items.shulker.ItemIronShulkerBox";
+	//private static final String IRON_SHULKER_GUI = "cpw.mods.ironchest.client.gui.shulker.GUIShulkerChest";
 
 	/**Is this item a shulker box (vanilla or modded)*/
 	public static boolean isShulkerBox(ItemStack stack) {
-		return stack != null && !stack.isEmpty() && (stack.getItem() instanceof ItemShulkerBox || stack.getItem().getClass().getName().equals(IRON_SHULKER_ITEM));
+		return stack != null && !stack.isEmpty() && (stack
+				.getItem() instanceof ItemShulkerBox/* || stack.getItem().getClass().getName().equals(IRON_SHULKER_ITEM)*/);
 	}
 
 	/**Is this container a shulker box (vanilla or modded)*/
 	@SideOnly(Side.CLIENT)
 	public static boolean isShulkerContainer(GuiContainer container) {
-		return container != null && (container instanceof GuiShulkerBox || container.getClass().getName().equals(IRON_SHULKER_GUI));
-	}
-	
-	/**Get the color of this shulker box*/
-	@Nullable
-	public static EnumDyeColor getColor(ItemStack stack) {
-		// TODO
-		return null;
+		return container != null
+				&& (container instanceof GuiShulkerBox/* || container.getClass().getName().equals(IRON_SHULKER_GUI)*/);
 	}
 
 	/**Is this right-clicking on a shulker box*/
@@ -68,7 +57,7 @@ public class Utils {
 
 	/**Open this shulker box gui*/
 	public static void openShulkerBox(EntityPlayerMP player, ItemStack stack) {
-		// iron chests
+		/*// iron chests
 		if (stack.getItem().getClass().getName().equals(IRON_SHULKER_ITEM)) {
 			IronShulkerBoxType type = IronShulkerBoxType.VALUES[stack.getMetadata()];
 			TileEntityLockableLoot te;
@@ -89,7 +78,7 @@ public class Utils {
 			net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.player.PlayerContainerEvent.Open(player, player.openContainer));
 		}
 		// vanilla
-		else {
+		else*/ {
 			TileEntitySAShulkerBox te = new TileEntitySAShulkerBox(player.world, stack);
 			player.closeContainer(); // instead of closeScreen to prevent mouse moving
 			player.getNextWindowId();
