@@ -1,11 +1,17 @@
 package furgl.listeners;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import com.google.common.collect.Lists;
+
 import furgl.containers.ContainerSAPlayer;
 import furgl.utils.Utils;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.TickEvent.ServerTickEvent;
+import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -13,16 +19,34 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber
 public class CommonEventHandler {
 
-	/**Replace player's main inventory*/	
+	/**Newly created players that need to have their inventories replaced*/
+	private static ArrayList<PlayerEntity> newPlayers = Lists.newArrayList();
+
 	@SubscribeEvent
-	public static void onJoinWorld(EntityJoinWorldEvent event) {
-		if (!event.getEntity().world.isRemote && event.getEntity() instanceof PlayerEntity) {
-			PlayerEntity player = (PlayerEntity) event.getEntity();
-			player.container = new ContainerSAPlayer(player.inventory, !player.world.isRemote, player);
-			player.openContainer = player.container;
+	public static void onPlayerCreated(EntityEvent.EntityConstructing event) {
+		if (event.getEntity() instanceof PlayerEntity && !event.getEntity().world.isRemote) 
+			newPlayers.add((PlayerEntity)event.getEntity());
+	}
+
+	@SubscribeEvent
+	public static void onTick(ServerTickEvent event) {
+		if (!newPlayers.isEmpty()) {
+			Iterator<PlayerEntity> it = newPlayers.iterator();
+			while (it.hasNext()) {
+				PlayerEntity player = it.next();
+				if (player.ticksExisted > 5)
+					replaceInventory(player);
+				it.remove();
+			}
 		}
 	}
-	
+
+	/** Replace player's main inventory */
+	public static void replaceInventory(PlayerEntity player) {
+		player.container = new ContainerSAPlayer(player.inventory, !player.world.isRemote, player);
+		player.openContainer = player.container;
+	}
+
 	/**Add tooltip when crafting shulker boxes*/
 	@SubscribeEvent
 	public static void onShulkerCrafted(PlayerEvent.ItemCraftedEvent event) {
@@ -30,5 +54,5 @@ public class CommonEventHandler {
 				((BlockItem)event.getCrafting().getItem()).getBlock() instanceof ShulkerBoxBlock) 
 			Utils.updateTooltip(event.getCrafting(), true);
 	}
-	
+
 }
